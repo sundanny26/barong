@@ -55,11 +55,11 @@ module API::V2
           unless current_user.documents.count + params[:upload].length <= Barong::App.config.doc_num_limit
             error!({ errors: ['resource.documents.limit_will_be_reached'] }, 400)
           end
-
+          identificator = SecureRandom.hex(16)
           params[:upload].each do |file|
-            doc = current_user.documents.new(declared(params).except(:upload).merge(upload: file))
+            doc = current_user.documents.new(declared(params).except(:upload).merge(upload: file, identificator: identificator))
 
-            code_error!(doc.errors.details, 422) unless doc.save
+            code_error!(doc.errors.details, 422) unless doc.save!
           end
           status 201
 
